@@ -4,4 +4,6 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
+#define MAX_NODES 100
+
 #endif // TODAIGRAPH_CONSTANTS_H
