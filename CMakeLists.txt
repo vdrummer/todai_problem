@@ -3,5 +3,5 @@ project(todai_graph)
 
 include_directories(include)
 
-add_executable(todai_graph src/main.c)
+add_executable(todai_graph src/main.c src/gamestate.c)
 target_link_libraries(todai_graph PRIVATE SDL2 cairo)

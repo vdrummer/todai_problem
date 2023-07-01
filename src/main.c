@@ -1,10 +1,22 @@
-#include "constants.h"
-
 #include <error.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <cairo/cairo.h>
+
+#include "constants.h"
+#include "gamestate.h"
+
+void handleEvents(Gamestate* gs) {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    switch(event.type) {
+      case SDL_QUIT:
+        gs->quit = true;
+        break;
+    }
+  }
+}
 
 int main(void) {
   if (SDL_Init(0) < 0) {
@@ -37,18 +49,11 @@ int main(void) {
     return EXIT_FAILURE;
   }
 
-  bool quit = false;
-  cairo_t* cr;
+  Gamestate gs;
+  gamestate_init(&gs);
 
-  while (!quit) {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      switch(event.type) {
-        case SDL_QUIT:
-          quit = true;
-          break;
-      }
-    }
+  while (!gs.quit) {
+    handleEvents(&gs);
 
     SDL_Rect windowDimensions = {0};
     SDL_GetWindowSize(window, &windowDimensions.w, &windowDimensions.h);
@@ -78,7 +83,8 @@ int main(void) {
         windowDimensions.h,
         sdlSurf->pitch
     );
-    cr = cairo_create(cairoSurf);
+
+    cairo_t* cr = cairo_create(cairoSurf);
 
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_paint(cr);
