@@ -18,6 +18,55 @@ void handleEvents(Gamestate* gs) {
   }
 }
 
+void render(SDL_Renderer* r, Gamestate* gs) {
+  const SDL_Rect windowDimensions = {
+    .w = WINDOW_WIDTH,
+    .h = WINDOW_HEIGHT,
+    .x = 0,
+    .y = 0,
+  };
+
+  SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+  SDL_RenderClear(r);
+
+  SDL_Surface* sdlSurf = SDL_CreateRGBSurface(
+      0,
+      windowDimensions.w,
+      windowDimensions.h,
+      32,
+      0x00ff0000,
+      0x0000ff00,
+      0x000000ff,
+      0x0
+  );
+  if (sdlSurf == NULL) {
+    perror("Could not create RGB Surface");
+    return;
+  }
+
+  cairo_surface_t* cairoSurf = cairo_image_surface_create_for_data(
+      sdlSurf->pixels,
+      CAIRO_FORMAT_RGB24,
+      windowDimensions.w,
+      windowDimensions.h,
+      sdlSurf->pitch
+  );
+
+  cairo_t* cr = cairo_create(cairoSurf);
+
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_paint(cr);
+
+  cairo_surface_destroy(cairoSurf);
+
+  SDL_Texture* sdlTexture = SDL_CreateTextureFromSurface(r, sdlSurf);
+  SDL_FreeSurface(sdlSurf);
+  SDL_RenderCopy(r, sdlTexture, &windowDimensions, &windowDimensions);
+  SDL_DestroyTexture(sdlTexture);
+
+  SDL_RenderPresent(r);
+}
+
 int main(void) {
   if (SDL_Init(0) < 0) {
     perror("Could not init SDL");
@@ -54,55 +103,7 @@ int main(void) {
 
   while (!gs.quit) {
     handleEvents(&gs);
-
-    SDL_Rect windowDimensions = {0};
-    SDL_GetWindowSize(window, &windowDimensions.w, &windowDimensions.h);
-
-    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
-    SDL_RenderClear(r);
-
-    SDL_Surface* sdlSurf = SDL_CreateRGBSurface(
-        0,
-        windowDimensions.w,
-        windowDimensions.h,
-        32,
-        0x00ff0000,
-        0x0000ff00,
-        0x000000ff,
-        0x0
-    );
-    if (sdlSurf == NULL) {
-      perror("Could not create RGB Surface");
-      return EXIT_FAILURE;
-    }
-
-    cairo_surface_t* cairoSurf = cairo_image_surface_create_for_data(
-        sdlSurf->pixels,
-        CAIRO_FORMAT_RGB24,
-        windowDimensions.w,
-        windowDimensions.h,
-        sdlSurf->pitch
-    );
-
-    cairo_t* cr = cairo_create(cairoSurf);
-
-    cairo_set_source_rgb(cr, 0, 0, 0);
-    cairo_paint(cr);
-
-    cairo_surface_destroy(cairoSurf);
-
-    SDL_Texture* sdlTexture = SDL_CreateTextureFromSurface(r, sdlSurf);
-    SDL_FreeSurface(sdlSurf);
-    const SDL_Rect rect = {
-      .w = windowDimensions.w,
-      .h = windowDimensions.h,
-      .x = 0,
-      .y = 0
-    };
-    SDL_RenderCopy(r, sdlTexture, &rect, &rect);
-    SDL_DestroyTexture(sdlTexture);
-
-    SDL_RenderPresent(r);
+    render(r, &gs);
   }
 
   SDL_DestroyRenderer(r);
