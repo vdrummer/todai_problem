@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <cairo/cairo.h>
+#include <math.h>
 
 #include "constants.h"
 #include "gamestate.h"
@@ -54,8 +55,22 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 
   cairo_t* cr = cairo_create(cairoSurf);
 
-  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
   cairo_paint(cr);
+
+  // render nodes
+  for (int i = 0; i < gs->numNodes; i++) {
+    Node* current = gs->nodes + i;
+    if (current->color == COLOR_BLACK) {
+      cairo_set_source_rgb(cr, 0, 0, 0);
+    } else {
+      cairo_set_source_rgb(cr, 1, 1, 1);
+    }
+
+    cairo_translate(cr, current->x, current->y);
+    cairo_arc(cr, 0, 0, NODE_RADIUS, 0, 2 * M_PI);
+    cairo_fill(cr);
+  }
 
   cairo_surface_destroy(cairoSurf);
 

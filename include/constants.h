@@ -6,4 +6,6 @@
 
 #define MAX_NODES 100
 
+#define NODE_RADIUS 10
+
 #endif // TODAIGRAPH_CONSTANTS_H
