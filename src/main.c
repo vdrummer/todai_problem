@@ -29,7 +29,41 @@ void selectNearest(Gamestate* gs, int x, int y) {
   }
 
   // edges
-  //TODO implement
+  for (int i = 0; i < MAX_NODES * MAX_NODES; i++) {
+    if (gs->edges[i] > 0) {
+      Node* n1 = gs->nodes + GET_NODE_X(i);
+      Node* n2 = gs->nodes + GET_NODE_Y(i);
+      const Point normal = ms_unitNormalVector(
+          (Point) {n1->x, n1->y},
+          (Point) {n2->x, n2->y}
+      );
+
+      const Point a = {
+        n1->x + normal.x * SELECTION_DIST,
+        n1->y + normal.y * SELECTION_DIST,
+      };
+
+      const Point b = {
+        n1->x - normal.x * SELECTION_DIST,
+        n1->y - normal.y * SELECTION_DIST,
+      };
+
+      const Point c = {
+        n2->x - normal.x * SELECTION_DIST,
+        n2->y - normal.y * SELECTION_DIST,
+      };
+
+      const Point d = {
+        n2->x + normal.x * SELECTION_DIST,
+        n2->y + normal.y * SELECTION_DIST,
+      };
+
+      if (ms_pointInRectangle((Point) {x, y}, a, b, c, d)) {
+        gs->selected.type = TYPE_EDGE;
+        gs->selected.value.edge = i;
+      }
+    }
+  }
 }
 
 void applyFunction(Gamestate* gs, int x, int y) {
@@ -167,6 +201,14 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     cairo_fill(cr);
   } else if (gs->selected.type == TYPE_EDGE) {
     //TODO implement
+    Node* n1 = gs->nodes + GET_NODE_X(gs->selected.value.edge);
+    Node* n2 = gs->nodes + GET_NODE_Y(gs->selected.value.edge);
+    cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
+    cairo_set_line_width(cr, EDGE_WIDTH);
+    cairo_move_to(cr, n1->x, n1->y);
+    cairo_line_to(cr, n2->x, n2->y);
+    cairo_close_path(cr);
+    cairo_stroke(cr);
   }
 
   cairo_surface_destroy(cairoSurf);
