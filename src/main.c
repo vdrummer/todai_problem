@@ -7,12 +7,11 @@
 
 #include "constants.h"
 #include "gamestate.h"
+#include "mathstuff.h"
 
-double fakeDist(double x1, double y1, double x2, double y2) {
-  const double dx = x1 - x2;
-  const double dy = y1 - y2;
-  return dx * dx + dy * dy;
-}
+#define GET_NODE_X(n) (n / MAX_NODES)
+#define GET_NODE_Y(n) (n % MAX_NODES)
+#define GET_NODE_XY(x, y) (MAX_NODES * y + x)
 
 void selectNearest(Gamestate* gs, int x, int y) {
   // default: nothing selected
@@ -21,7 +20,7 @@ void selectNearest(Gamestate* gs, int x, int y) {
   // nodes
   for (int i = 0; i < gs->numNodes; i++) {
     Node* current = gs->nodes + i;
-    if (fakeDist(x, y, current->x, current->y)
+    if (ms_squaredDist((Point) {x, y}, (Point) {current->x, current->y})
         < SELECTION_RADIUS * SELECTION_RADIUS
     ) {
       gs->selected.type = TYPE_NODE;
@@ -36,14 +35,20 @@ void selectNearest(Gamestate* gs, int x, int y) {
 void applyFunction(Gamestate* gs, int x, int y) {
   if (gs->selected.type == TYPE_NODE) {
     if (gs->numNodes < MAX_NODES) {
+      Node* currentNode = gs->selected.value.node;
       gs->nodes[gs->numNodes] = (Node) {
         .color = COLOR_WHITE,
         .x = x,
         .y = y,
       };
+      currentNode->color = !currentNode->color;
+
+      // add edge
+      int currentIndex = (int) (currentNode - gs->nodes);
+      // N.B.: only the bottom left half of the matrix is filled
+      gs->edges[GET_NODE_XY(currentIndex, gs->numNodes)] = 1;
+
       gs->numNodes++;
-      gs->selected.value.node->color = !gs->selected.value.node->color;
-      //TODO add edge
     } else {
       //TODO error handling
       perror("max number of nodes reached");
@@ -125,14 +130,25 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 
   cairo_t* cr = cairo_create(cairoSurf);
 
-  cairo_save(cr);
-
   cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
   cairo_paint(cr);
 
+  // render edges
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  for (int i = 0; i < MAX_NODES * MAX_NODES; i++) {
+    if (gs->edges[i] != 0) {
+      Node* n1 = gs->nodes + GET_NODE_X(i);
+      Node* n2 = gs->nodes + GET_NODE_Y(i);
+      cairo_set_line_width(cr, EDGE_WIDTH);
+      cairo_move_to(cr, n1->x, n1->y);
+      cairo_line_to(cr, n2->x, n2->y);
+      cairo_close_path(cr);
+      cairo_stroke(cr);
+    }
+  }
+
   // render nodes
   for (int i = 0; i < gs->numNodes; i++) {
-    cairo_save(cr);
     Node* current = gs->nodes + i;
     if (current->color == COLOR_BLACK) {
       cairo_set_source_rgb(cr, 0, 0, 0);
@@ -140,18 +156,14 @@ void render(SDL_Renderer* r, Gamestate* gs) {
       cairo_set_source_rgb(cr, 1, 1, 1);
     }
 
-    cairo_translate(cr, current->x, current->y);
-    cairo_arc(cr, 0, 0, NODE_RADIUS, 0, 2 * M_PI);
+    cairo_arc(cr, current->x, current->y, NODE_RADIUS, 0, 2 * M_PI);
     cairo_fill(cr);
-    cairo_restore(cr);
   }
 
   // render selection
-  cairo_restore(cr);
   if (gs->selected.type == TYPE_NODE) {
     cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
-    cairo_translate(cr, gs->selected.value.node->x, gs->selected.value.node->y);
-    cairo_arc(cr, 0, 0, NODE_RADIUS, 0, 2 * M_PI);
+    cairo_arc(cr, gs->selected.value.node->x, gs->selected.value.node->y, NODE_RADIUS, 0, 2 * M_PI);
     cairo_fill(cr);
   } else if (gs->selected.type == TYPE_EDGE) {
     //TODO implement
