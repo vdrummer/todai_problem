@@ -8,12 +8,41 @@
 #include "constants.h"
 #include "gamestate.h"
 
+double fakeDist(double x1, double y1, double x2, double y2) {
+  const double dx = x1 - x2;
+  const double dy = y1 - y2;
+  return dx * dx + dy * dy;
+}
+
+void selectNearest(Gamestate* gs, int x, int y) {
+  // default: nothing selected
+  gs->selected.type = TYPE_NONE;
+
+  // nodes
+  for (int i = 0; i < gs->numNodes; i++) {
+    Node* current = gs->nodes + i;
+    if (fakeDist(x, y, current->x, current->y)
+        < SELECTION_DISTANCE * SELECTION_DISTANCE
+    ) {
+      gs->selected.type = TYPE_NODE;
+      gs->selected.value.node = current;
+    }
+  }
+
+  // edges
+}
+
 void handleEvents(Gamestate* gs) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch(event.type) {
       case SDL_QUIT:
         gs->quit = true;
+        break;
+      case SDL_MOUSEBUTTONDOWN:
+        if (event.button.button == SDL_BUTTON_LEFT) {
+          selectNearest(gs, event.button.x, event.button.y);
+        }
         break;
     }
   }
@@ -55,11 +84,14 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 
   cairo_t* cr = cairo_create(cairoSurf);
 
+  cairo_save(cr);
+
   cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
   cairo_paint(cr);
 
   // render nodes
   for (int i = 0; i < gs->numNodes; i++) {
+    cairo_save(cr);
     Node* current = gs->nodes + i;
     if (current->color == COLOR_BLACK) {
       cairo_set_source_rgb(cr, 0, 0, 0);
@@ -70,6 +102,18 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     cairo_translate(cr, current->x, current->y);
     cairo_arc(cr, 0, 0, NODE_RADIUS, 0, 2 * M_PI);
     cairo_fill(cr);
+    cairo_restore(cr);
+  }
+
+  // render selection
+  cairo_restore(cr);
+  if (gs->selected.type == TYPE_NODE) {
+    cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
+    cairo_translate(cr, gs->selected.value.node->x, gs->selected.value.node->y);
+    cairo_arc(cr, 0, 0, NODE_RADIUS, 0, 2 * M_PI);
+    cairo_fill(cr);
+  } else if (gs->selected.type == TYPE_EDGE) {
+    //TODO implement
   }
 
   cairo_surface_destroy(cairoSurf);
