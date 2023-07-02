@@ -30,17 +30,19 @@ void selectNearest(Gamestate* gs, int x, int y) {
   }
 
   // edges
+  //TODO implement
 }
 
 void applyFunction(Gamestate* gs, int x, int y) {
   if (gs->selected.type == TYPE_NODE) {
     if (gs->numNodes < MAX_NODES) {
       gs->nodes[gs->numNodes] = (Node) {
-        .color = !gs->selected.value.node->color,
+        .color = COLOR_WHITE,
         .x = x,
         .y = y,
       };
       gs->numNodes++;
+      gs->selected.value.node->color = !gs->selected.value.node->color;
       //TODO add edge
     } else {
       //TODO error handling
