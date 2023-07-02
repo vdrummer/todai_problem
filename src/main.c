@@ -25,6 +25,7 @@ void selectNearest(Gamestate* gs, int x, int y) {
     ) {
       gs->selected.type = TYPE_NODE;
       gs->selected.value.node = current;
+      return; // to prioritize nodes over edges
     }
   }
 
