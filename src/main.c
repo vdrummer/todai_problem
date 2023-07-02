@@ -63,6 +63,7 @@ void handleEvents(Gamestate* gs) {
       case SDL_KEYDOWN:
         switch (event.key.keysym.sym) {
           case SDLK_LSHIFT:
+          case SDLK_RSHIFT:
             gs->shiftPressed = true;
             break;
         }
@@ -70,6 +71,7 @@ void handleEvents(Gamestate* gs) {
       case SDL_KEYUP:
         switch (event.key.keysym.sym) {
           case SDLK_LSHIFT:
+          case SDLK_RSHIFT:
             gs->shiftPressed = false;
             break;
         }
