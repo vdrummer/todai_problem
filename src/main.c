@@ -22,7 +22,7 @@ void selectNearest(Gamestate* gs, int x, int y) {
   for (int i = 0; i < gs->numNodes; i++) {
     Node* current = gs->nodes + i;
     if (fakeDist(x, y, current->x, current->y)
-        < SELECTION_DISTANCE * SELECTION_DISTANCE
+        < SELECTION_RADIUS * SELECTION_RADIUS
     ) {
       gs->selected.type = TYPE_NODE;
       gs->selected.value.node = current;
