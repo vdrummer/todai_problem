@@ -88,7 +88,31 @@ void applyFunction(Gamestate* gs, int x, int y) {
       perror("max number of nodes reached");
     }
   } else if (gs->selected.type == TYPE_EDGE) {
-    //TODO implement
+    const int selectedIdx = gs->selected.value.edge;
+    const int n1Idx = GET_NODE_X(selectedIdx);
+    const int n2Idx = GET_NODE_Y(selectedIdx);
+
+    if (gs->numNodes >= MAX_NODES) {
+      perror("max number of nodes reached");
+      return;
+    }
+
+    gs->nodes[gs->numNodes] = (Node) {
+      .color = COLOR_WHITE,
+      .x = x,
+      .y = y,
+    };
+
+    gs->edges[selectedIdx] = 0;
+    gs->edges[GET_NODE_XY(n1Idx, gs->numNodes)] = 1;
+    gs->edges[GET_NODE_XY(n2Idx, gs->numNodes)] = 1;
+
+    gs->nodes[n1Idx].color = !gs->nodes[n1Idx].color;
+    gs->nodes[n2Idx].color = !gs->nodes[n2Idx].color;
+
+    gs->selected.type = TYPE_NONE;
+
+    gs->numNodes++;
   }
 }
 
