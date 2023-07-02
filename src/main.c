@@ -181,6 +181,18 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     }
   }
 
+  // seleted edge
+  if (gs->selected.type == TYPE_EDGE) {
+    Node* n1 = gs->nodes + GET_NODE_X(gs->selected.value.edge);
+    Node* n2 = gs->nodes + GET_NODE_Y(gs->selected.value.edge);
+    cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
+    cairo_set_line_width(cr, EDGE_WIDTH);
+    cairo_move_to(cr, n1->x, n1->y);
+    cairo_line_to(cr, n2->x, n2->y);
+    cairo_close_path(cr);
+    cairo_stroke(cr);
+  }
+
   // render nodes
   for (int i = 0; i < gs->numNodes; i++) {
     Node* current = gs->nodes + i;
@@ -194,22 +206,12 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     cairo_fill(cr);
   }
 
-  // render selection
+  // selected node
   if (gs->selected.type == TYPE_NODE) {
     cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
     cairo_arc(cr, gs->selected.value.node->x, gs->selected.value.node->y, NODE_RADIUS, 0, 2 * M_PI);
     cairo_fill(cr);
-  } else if (gs->selected.type == TYPE_EDGE) {
-    //TODO implement
-    Node* n1 = gs->nodes + GET_NODE_X(gs->selected.value.edge);
-    Node* n2 = gs->nodes + GET_NODE_Y(gs->selected.value.edge);
-    cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
-    cairo_set_line_width(cr, EDGE_WIDTH);
-    cairo_move_to(cr, n1->x, n1->y);
-    cairo_line_to(cr, n2->x, n2->y);
-    cairo_close_path(cr);
-    cairo_stroke(cr);
-  }
+  } 
 
   cairo_surface_destroy(cairoSurf);
 
