@@ -117,6 +117,23 @@ void applyFunction(Gamestate* gs, int x, int y) {
   }
 }
 
+void activateMoveMode(Gamestate* gs) {
+  if (gs->selected.type != TYPE_NODE) {
+    // can only move nodes
+    return;
+  }
+
+  gs->moveMode = true;
+}
+
+void moveNode(Gamestate* gs, int x, int y) {
+  if (gs->moveMode && gs->selected.type == TYPE_NODE) {
+    Node* current = gs->selected.value.node;
+    current->x = x;
+    current->y = y;
+  }
+}
+
 void handleEvents(Gamestate* gs) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
@@ -147,8 +164,17 @@ void handleEvents(Gamestate* gs) {
           } else {
             applyFunction(gs, event.button.x, event.button.y);
           }
+        } else if (event.button.button == SDL_BUTTON_RIGHT) {
+          activateMoveMode(gs);
         }
         break;
+      case SDL_MOUSEBUTTONUP:
+        if (event.button.button == SDL_BUTTON_RIGHT) {
+          gs->moveMode = false;
+        }
+        break;
+      case SDL_MOUSEMOTION:
+        moveNode(gs, event.motion.x, event.motion.y);
     }
   }
 }

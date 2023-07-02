@@ -40,6 +40,7 @@ typedef struct gamestate Gamestate;
 struct gamestate {
   bool quit;
   bool shiftPressed;
+  bool moveMode;
   int numNodes;
   Node nodes[MAX_NODES];
   uint8_t edges[MAX_NODES * MAX_NODES];
