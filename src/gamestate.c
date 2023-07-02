@@ -10,6 +10,7 @@ void gamestate_init(Gamestate* gs) {
     return;
   }
   gs->quit = false;
+  gs->shiftPressed = false;
   gs->numNodes = 1;
   memset(gs->edges, 0, MAX_NODES * MAX_NODES);
   memset(gs->nodes, 0, MAX_NODES);

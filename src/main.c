@@ -32,6 +32,25 @@ void selectNearest(Gamestate* gs, int x, int y) {
   // edges
 }
 
+void applyFunction(Gamestate* gs, int x, int y) {
+  if (gs->selected.type == TYPE_NODE) {
+    if (gs->numNodes < MAX_NODES) {
+      gs->nodes[gs->numNodes] = (Node) {
+        .color = !gs->selected.value.node->color,
+        .x = x,
+        .y = y,
+      };
+      gs->numNodes++;
+      //TODO add edge
+    } else {
+      //TODO error handling
+      perror("max number of nodes reached");
+    }
+  } else if (gs->selected.type == TYPE_EDGE) {
+    //TODO implement
+  }
+}
+
 void handleEvents(Gamestate* gs) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
@@ -39,9 +58,27 @@ void handleEvents(Gamestate* gs) {
       case SDL_QUIT:
         gs->quit = true;
         break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+          case SDLK_LSHIFT:
+            gs->shiftPressed = true;
+            break;
+        }
+        break;
+      case SDL_KEYUP:
+        switch (event.key.keysym.sym) {
+          case SDLK_LSHIFT:
+            gs->shiftPressed = false;
+            break;
+        }
+        break;
       case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
-          selectNearest(gs, event.button.x, event.button.y);
+          if (!gs->shiftPressed) {
+            selectNearest(gs, event.button.x, event.button.y);
+          } else {
+            applyFunction(gs, event.button.x, event.button.y);
+          }
         }
         break;
     }
