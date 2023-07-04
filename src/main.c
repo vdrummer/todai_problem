@@ -275,7 +275,7 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 }
 
 int main(void) {
-  if (SDL_Init(0) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     perror("Could not init SDL");
     return EXIT_FAILURE;
   }
