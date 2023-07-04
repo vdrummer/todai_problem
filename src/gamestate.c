@@ -33,6 +33,7 @@ void snapshot_load(Gamestate* gs) {
   list->index = (list->index - 1 + HISTSIZE) % HISTSIZE;
   memcpy(gs, list->snapshots + list->index, sizeof(Snapshot));
   list->length--;
+  gs->selected.type = TYPE_NONE;
 }
 
 void snapshot_save(Gamestate* gs) {

@@ -70,6 +70,7 @@ void selectNearest(Gamestate* gs, int x, int y) {
 void applyFunction(Gamestate* gs, int x, int y) {
   if (gs->selected.type == TYPE_NODE) {
     if (gs->numNodes < MAX_NODES) {
+      snapshot_save(gs);
       Node* currentNode = gs->selected.value.node;
       gs->nodes[gs->numNodes] = (Node) {
         .color = COLOR_WHITE,
@@ -89,6 +90,7 @@ void applyFunction(Gamestate* gs, int x, int y) {
       perror("max number of nodes reached");
     }
   } else if (gs->selected.type == TYPE_EDGE) {
+    snapshot_save(gs);
     const int selectedIdx = gs->selected.value.edge;
     const int n1Idx = GET_NODE_X(selectedIdx);
     const int n2Idx = GET_NODE_Y(selectedIdx);
@@ -124,6 +126,7 @@ void activateMoveMode(Gamestate* gs) {
   }
 
   gs->moveMode = true;
+  snapshot_save(gs);
 }
 
 void changeNodeColor(Gamestate* gs, Color color) {
@@ -131,6 +134,7 @@ void changeNodeColor(Gamestate* gs, Color color) {
         return;
     }
 
+    snapshot_save(gs);
     gs->selected.value.node->color = color;
 }
 
@@ -160,6 +164,9 @@ void handleEvents(Gamestate* gs) {
             break;
           case SDLK_w:
             changeNodeColor(gs, COLOR_WHITE);
+            break;
+          case SDLK_u:
+            snapshot_load(gs);
             break;
         }
         break;
