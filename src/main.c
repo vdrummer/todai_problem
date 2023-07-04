@@ -134,6 +134,10 @@ void changeNodeColor(Gamestate* gs, Color color) {
         return;
     }
 
+    if (gs->selected.value.node->color == color) {
+      return;
+    }
+
     snapshot_save(gs);
     gs->selected.value.node->color = color;
 }
