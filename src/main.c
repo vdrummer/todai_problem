@@ -276,7 +276,7 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     cairo_set_source_rgba(cr, 1, 0, 0, 0.5);
     cairo_arc(cr, gs->selected.value.node->x, gs->selected.value.node->y, NODE_RADIUS, 0, 2 * M_PI);
     cairo_fill(cr);
-  } 
+  }
 
   cairo_surface_destroy(cairoSurf);
 
