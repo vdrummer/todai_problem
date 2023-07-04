@@ -126,6 +126,14 @@ void activateMoveMode(Gamestate* gs) {
   gs->moveMode = true;
 }
 
+void changeNodeColor(Gamestate* gs, Color color) {
+    if (gs->selected.type != TYPE_NODE) {
+        return;
+    }
+
+    gs->selected.value.node->color = color;
+}
+
 void moveNode(Gamestate* gs, int x, int y) {
   if (gs->moveMode && gs->selected.type == TYPE_NODE) {
     Node* current = gs->selected.value.node;
@@ -146,6 +154,12 @@ void handleEvents(Gamestate* gs) {
           case SDLK_LSHIFT:
           case SDLK_RSHIFT:
             gs->shiftPressed = true;
+            break;
+          case SDLK_b:
+            changeNodeColor(gs, COLOR_BLACK);
+            break;
+          case SDLK_w:
+            changeNodeColor(gs, COLOR_WHITE);
             break;
         }
         break;
