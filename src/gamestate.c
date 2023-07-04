@@ -26,12 +26,20 @@ void gamestate_init(Gamestate* gs) {
 
 void snapshot_load(Gamestate* gs) {
   SnapshotList* list = &gs->snapshotList;
+  if (list->length <= 0) {
+    return;
+  }
+
   list->index = (list->index - 1 + HISTSIZE) % HISTSIZE;
   memcpy(gs, list->snapshots + list->index, sizeof(Snapshot));
+  list->length--;
 }
 
 void snapshot_save(Gamestate* gs) {
   SnapshotList* list = &gs->snapshotList;
   memcpy(list->snapshots + list->index, gs, sizeof(Snapshot));
   list->index = (list->index + 1) % HISTSIZE;
+  if (list->length < HISTSIZE) {
+    list->length++;
+  }
 }
