@@ -13,6 +13,7 @@ void gamestate_init(Gamestate* gs) {
   gs->shiftPressed = false;
   gs->moveMode = false;
   gs->numNodes = 1;
+  gs->snapshotList = (SnapshotList) {0};
   memset(gs->edges, 0, MAX_NODES * MAX_NODES);
   memset(gs->nodes, 0, MAX_NODES);
 
@@ -21,4 +22,16 @@ void gamestate_init(Gamestate* gs) {
     .x = WINDOW_WIDTH / 2,
     .y = WINDOW_HEIGHT / 2,
   };
+}
+
+void snapshot_load(Gamestate* gs) {
+  SnapshotList* list = &gs->snapshotList;
+  list->index = (list->index - 1 + HISTSIZE) % HISTSIZE;
+  memcpy(gs, list->snapshots + list->index, sizeof(Snapshot));
+}
+
+void snapshot_save(Gamestate* gs) {
+  SnapshotList* list = &gs->snapshotList;
+  memcpy(list->snapshots + list->index, gs, sizeof(Snapshot));
+  list->index = (list->index + 1) % HISTSIZE;
 }

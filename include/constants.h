@@ -12,4 +12,6 @@
 #define EDGE_WIDTH 3
 #define SELECTION_DIST 5
 
+#define HISTSIZE 10
+
 #endif // TODAIGRAPH_CONSTANTS_H
