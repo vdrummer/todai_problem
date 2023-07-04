@@ -240,7 +240,12 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 
   cairo_t* cr = cairo_create(cairoSurf);
 
-  cairo_set_source_rgb(cr, 0.5, 0.5, 0.5);
+  cairo_set_source_rgb(
+      cr,
+      FILLCOLOR_BACKGROUND_R,
+      FILLCOLOR_BACKGROUND_G,
+      FILLCOLOR_BACKGROUND_B
+  );
   cairo_paint(cr);
 
   // render edges
