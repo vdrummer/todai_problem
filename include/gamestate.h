@@ -36,17 +36,36 @@ struct selection {
   } value;
 };
 
-typedef struct gamestate Gamestate;
-struct gamestate {
-  bool quit;
-  bool shiftPressed;
-  bool moveMode;
+typedef struct snapshot Snapshot;
+struct snapshot {
   int numNodes;
   Node nodes[MAX_NODES];
   uint8_t edges[MAX_NODES * MAX_NODES];
+};
+
+// To be zero-initialized
+typedef struct snapshotList SnapshotList;
+struct snapshotList {
+  Snapshot snapshots[HISTSIZE];
+  int length;
+  int index;
+};
+
+typedef struct gamestate Gamestate;
+struct gamestate {
+  int numNodes;
+  Node nodes[MAX_NODES];
+  uint8_t edges[MAX_NODES * MAX_NODES];
+  bool quit;
+  bool shiftPressed;
+  bool moveMode;
   Selection selected;
+  SnapshotList snapshotList;
 };
 
 void gamestate_init(Gamestate* gs);
+
+void snapshot_load(Gamestate* gs);
+void snapshot_save(Gamestate* gs);
 
 #endif // TODAIGRAPH_GAMESTATE_H

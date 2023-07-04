@@ -70,6 +70,7 @@ void selectNearest(Gamestate* gs, int x, int y) {
 void applyFunction(Gamestate* gs, int x, int y) {
   if (gs->selected.type == TYPE_NODE) {
     if (gs->numNodes < MAX_NODES) {
+      snapshot_save(gs);
       Node* currentNode = gs->selected.value.node;
       gs->nodes[gs->numNodes] = (Node) {
         .color = COLOR_WHITE,
@@ -89,6 +90,7 @@ void applyFunction(Gamestate* gs, int x, int y) {
       perror("max number of nodes reached");
     }
   } else if (gs->selected.type == TYPE_EDGE) {
+    snapshot_save(gs);
     const int selectedIdx = gs->selected.value.edge;
     const int n1Idx = GET_NODE_X(selectedIdx);
     const int n2Idx = GET_NODE_Y(selectedIdx);
@@ -124,6 +126,20 @@ void activateMoveMode(Gamestate* gs) {
   }
 
   gs->moveMode = true;
+  snapshot_save(gs);
+}
+
+void changeNodeColor(Gamestate* gs, Color color) {
+    if (gs->selected.type != TYPE_NODE) {
+        return;
+    }
+
+    if (gs->selected.value.node->color == color) {
+      return;
+    }
+
+    snapshot_save(gs);
+    gs->selected.value.node->color = color;
 }
 
 void moveNode(Gamestate* gs, int x, int y) {
@@ -146,6 +162,15 @@ void handleEvents(Gamestate* gs) {
           case SDLK_LSHIFT:
           case SDLK_RSHIFT:
             gs->shiftPressed = true;
+            break;
+          case SDLK_b:
+            changeNodeColor(gs, COLOR_BLACK);
+            break;
+          case SDLK_w:
+            changeNodeColor(gs, COLOR_WHITE);
+            break;
+          case SDLK_u:
+            snapshot_load(gs);
             break;
         }
         break;
@@ -287,7 +312,7 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 }
 
 int main(void) {
-  if (SDL_Init(0) < 0) {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     perror("Could not init SDL");
     return EXIT_FAILURE;
   }
