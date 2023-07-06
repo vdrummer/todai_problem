@@ -172,6 +172,8 @@ void handleEvents(Gamestate* gs) {
           case SDLK_u:
             snapshot_load(gs);
             break;
+          case SDLK_r:
+            gamestate_init(gs);
         }
         break;
       case SDL_KEYUP:

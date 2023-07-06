@@ -38,6 +38,7 @@ You can change various parameters in `include/constants.h`.
 - u: undo last action.
 - b: make the selected node black.
 - w: make the selected node white.
+- r: reset
 
 ## Known Limitations
 
@@ -47,7 +48,7 @@ You can change various parameters in `include/constants.h`.
 
 I consider the program (almost) feature complete. Further improvments planned are:
 
-- new feature: reset key
+- ~~new feature: reset key~~
 - refactor rendering, gamestate
 - new control scheme
 - (using dynamic data structures)
