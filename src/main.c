@@ -321,6 +321,7 @@ int main(void) {
     render(&rs, &gs);
   }
 
+  renderstate_destroy(&rs);
   SDL_DestroyRenderer(r);
   SDL_DestroyWindow(window);
   SDL_Quit();

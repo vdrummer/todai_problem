@@ -53,3 +53,13 @@ void renderstate_render(Renderstate* rs) {
 
   SDL_RenderPresent(rs->r);
 }
+
+void renderstate_destroy(Renderstate* rs) {
+  if (rs == NULL) {
+    return;
+  }
+
+  SDL_FreeSurface(rs->sdlSurf);
+  cairo_surface_destroy(rs->cairoSurf);
+  cairo_destroy(rs->cr);
+}

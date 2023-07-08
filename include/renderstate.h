@@ -16,5 +16,6 @@ struct renderstate {
 
 void renderstate_init(Renderstate* rs, SDL_Renderer* r);
 void renderstate_render(Renderstate* rs);
+void renderstate_destroy(Renderstate* rs);
 
 #endif // TODAIGRAPH_RENDERSTATE_H
