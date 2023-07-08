@@ -9,9 +9,9 @@ void gamestate_init(Gamestate* gs) {
   if (gs == NULL) {
     return;
   }
-  gs->quit = false;
-  gs->shiftPressed = false;
-  gs->moveMode = false;
+  gs->flags.quit = false;
+  gs->flags.shiftPressed = false;
+  gs->flags.moveMode = false;
   gs->graph.numNodes = 1;
   gs->snapshotList = (SnapshotList) {0};
   memset(gs->graph.edges, 0, MAX_NODES * MAX_NODES);

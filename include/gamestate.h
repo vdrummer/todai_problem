@@ -51,14 +51,19 @@ struct snapshotList {
   int index;
 };
 
+typedef struct flags Flags;
+struct flags {
+  bool quit;
+  bool shiftPressed;
+  bool moveMode;
+};
+
 typedef Snapshot Graph;
 
 typedef struct gamestate Gamestate;
 struct gamestate {
   Graph graph;
-  bool quit;
-  bool shiftPressed;
-  bool moveMode;
+  Flags flags;
   Selection selected;
   SnapshotList snapshotList;
 };

@@ -125,7 +125,7 @@ void activateMoveMode(Gamestate* gs) {
     return;
   }
 
-  gs->moveMode = true;
+  gs->flags.moveMode = true;
   snapshot_save(gs);
 }
 
@@ -143,7 +143,7 @@ void changeNodeColor(Gamestate* gs, Color color) {
 }
 
 void moveNode(Gamestate* gs, int x, int y) {
-  if (gs->moveMode && gs->selected.type == TYPE_NODE) {
+  if (gs->flags.moveMode && gs->selected.type == TYPE_NODE) {
     Node* current = gs->selected.value.node;
     current->x = x;
     current->y = y;
@@ -155,13 +155,13 @@ void handleEvents(Gamestate* gs) {
   while (SDL_PollEvent(&event)) {
     switch(event.type) {
       case SDL_QUIT:
-        gs->quit = true;
+        gs->flags.quit = true;
         break;
       case SDL_KEYDOWN:
         switch (event.key.keysym.sym) {
           case SDLK_LSHIFT:
           case SDLK_RSHIFT:
-            gs->shiftPressed = true;
+            gs->flags.shiftPressed = true;
             break;
           case SDLK_b:
             changeNodeColor(gs, COLOR_BLACK);
@@ -180,13 +180,13 @@ void handleEvents(Gamestate* gs) {
         switch (event.key.keysym.sym) {
           case SDLK_LSHIFT:
           case SDLK_RSHIFT:
-            gs->shiftPressed = false;
+            gs->flags.shiftPressed = false;
             break;
         }
         break;
       case SDL_MOUSEBUTTONDOWN:
         if (event.button.button == SDL_BUTTON_LEFT) {
-          if (!gs->shiftPressed) {
+          if (!gs->flags.shiftPressed) {
             selectNearest(gs, event.button.x, event.button.y);
           } else {
             applyFunction(gs, event.button.x, event.button.y);
@@ -197,7 +197,7 @@ void handleEvents(Gamestate* gs) {
         break;
       case SDL_MOUSEBUTTONUP:
         if (event.button.button == SDL_BUTTON_RIGHT) {
-          gs->moveMode = false;
+          gs->flags.moveMode = false;
         }
         break;
       case SDL_MOUSEMOTION:
@@ -352,7 +352,7 @@ int main(void) {
   Gamestate gs;
   gamestate_init(&gs);
 
-  while (!gs.quit) {
+  while (!gs.flags.quit) {
     handleEvents(&gs);
     render(r, &gs);
   }
