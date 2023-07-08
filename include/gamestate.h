@@ -51,11 +51,11 @@ struct snapshotList {
   int index;
 };
 
+typedef Snapshot Graph;
+
 typedef struct gamestate Gamestate;
 struct gamestate {
-  int numNodes;
-  Node nodes[MAX_NODES];
-  uint8_t edges[MAX_NODES * MAX_NODES];
+  Graph graph;
   bool quit;
   bool shiftPressed;
   bool moveMode;

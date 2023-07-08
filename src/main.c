@@ -18,8 +18,8 @@ void selectNearest(Gamestate* gs, int x, int y) {
   gs->selected.type = TYPE_NONE;
 
   // nodes
-  for (int i = 0; i < gs->numNodes; i++) {
-    Node* current = gs->nodes + i;
+  for (int i = 0; i < gs->graph.numNodes; i++) {
+    Node* current = gs->graph.nodes + i;
     if (ms_squaredDist((Point) {x, y}, (Point) {current->x, current->y})
         < SELECTION_RADIUS * SELECTION_RADIUS
     ) {
@@ -31,9 +31,9 @@ void selectNearest(Gamestate* gs, int x, int y) {
 
   // edges
   for (int i = 0; i < MAX_NODES * MAX_NODES; i++) {
-    if (gs->edges[i] > 0) {
-      Node* n1 = gs->nodes + GET_NODE_X(i);
-      Node* n2 = gs->nodes + GET_NODE_Y(i);
+    if (gs->graph.edges[i] > 0) {
+      Node* n1 = gs->graph.nodes + GET_NODE_X(i);
+      Node* n2 = gs->graph.nodes + GET_NODE_Y(i);
       const Point normal = ms_unitNormalVector(
           (Point) {n1->x, n1->y},
           (Point) {n2->x, n2->y}
@@ -69,10 +69,10 @@ void selectNearest(Gamestate* gs, int x, int y) {
 
 void applyFunction(Gamestate* gs, int x, int y) {
   if (gs->selected.type == TYPE_NODE) {
-    if (gs->numNodes < MAX_NODES) {
+    if (gs->graph.numNodes < MAX_NODES) {
       snapshot_save(gs);
       Node* currentNode = gs->selected.value.node;
-      gs->nodes[gs->numNodes] = (Node) {
+      gs->graph.nodes[gs->graph.numNodes] = (Node) {
         .color = COLOR_WHITE,
         .x = x,
         .y = y,
@@ -80,11 +80,11 @@ void applyFunction(Gamestate* gs, int x, int y) {
       currentNode->color = !currentNode->color;
 
       // add edge
-      int currentIndex = (int) (currentNode - gs->nodes);
+      int currentIndex = (int) (currentNode - gs->graph.nodes);
       // N.B.: only the bottom left half of the matrix is filled
-      gs->edges[GET_NODE_XY(currentIndex, gs->numNodes)] = 1;
+      gs->graph.edges[GET_NODE_XY(currentIndex, gs->graph.numNodes)] = 1;
 
-      gs->numNodes++;
+      gs->graph.numNodes++;
     } else {
       //TODO error handling
       perror("max number of nodes reached");
@@ -95,27 +95,27 @@ void applyFunction(Gamestate* gs, int x, int y) {
     const int n1Idx = GET_NODE_X(selectedIdx);
     const int n2Idx = GET_NODE_Y(selectedIdx);
 
-    if (gs->numNodes >= MAX_NODES) {
+    if (gs->graph.numNodes >= MAX_NODES) {
       perror("max number of nodes reached");
       return;
     }
 
-    gs->nodes[gs->numNodes] = (Node) {
+    gs->graph.nodes[gs->graph.numNodes] = (Node) {
       .color = COLOR_WHITE,
       .x = x,
       .y = y,
     };
 
-    gs->edges[selectedIdx] = 0;
-    gs->edges[GET_NODE_XY(n1Idx, gs->numNodes)] = 1;
-    gs->edges[GET_NODE_XY(n2Idx, gs->numNodes)] = 1;
+    gs->graph.edges[selectedIdx] = 0;
+    gs->graph.edges[GET_NODE_XY(n1Idx, gs->graph.numNodes)] = 1;
+    gs->graph.edges[GET_NODE_XY(n2Idx, gs->graph.numNodes)] = 1;
 
-    gs->nodes[n1Idx].color = !gs->nodes[n1Idx].color;
-    gs->nodes[n2Idx].color = !gs->nodes[n2Idx].color;
+    gs->graph.nodes[n1Idx].color = !gs->graph.nodes[n1Idx].color;
+    gs->graph.nodes[n2Idx].color = !gs->graph.nodes[n2Idx].color;
 
     gs->selected.type = TYPE_NONE;
 
-    gs->numNodes++;
+    gs->graph.numNodes++;
   }
 }
 
@@ -253,9 +253,9 @@ void render(SDL_Renderer* r, Gamestate* gs) {
   // render edges
   cairo_set_source_rgb(cr, 0, 0, 0);
   for (int i = 0; i < MAX_NODES * MAX_NODES; i++) {
-    if (gs->edges[i] != 0) {
-      Node* n1 = gs->nodes + GET_NODE_X(i);
-      Node* n2 = gs->nodes + GET_NODE_Y(i);
+    if (gs->graph.edges[i] != 0) {
+      Node* n1 = gs->graph.nodes + GET_NODE_X(i);
+      Node* n2 = gs->graph.nodes + GET_NODE_Y(i);
       cairo_set_line_width(cr, EDGE_WIDTH);
       cairo_move_to(cr, n1->x, n1->y);
       cairo_line_to(cr, n2->x, n2->y);
@@ -266,8 +266,8 @@ void render(SDL_Renderer* r, Gamestate* gs) {
 
   // seleted edge
   if (gs->selected.type == TYPE_EDGE) {
-    Node* n1 = gs->nodes + GET_NODE_X(gs->selected.value.edge);
-    Node* n2 = gs->nodes + GET_NODE_Y(gs->selected.value.edge);
+    Node* n1 = gs->graph.nodes + GET_NODE_X(gs->selected.value.edge);
+    Node* n2 = gs->graph.nodes + GET_NODE_Y(gs->selected.value.edge);
     cairo_set_source_rgba(
         cr,
         FILLCOLOR_SELECTED_R,
@@ -283,8 +283,8 @@ void render(SDL_Renderer* r, Gamestate* gs) {
   }
 
   // render nodes
-  for (int i = 0; i < gs->numNodes; i++) {
-    Node* current = gs->nodes + i;
+  for (int i = 0; i < gs->graph.numNodes; i++) {
+    Node* current = gs->graph.nodes + i;
     if (current->color == COLOR_BLACK) {
       cairo_set_source_rgb(cr, 0, 0, 0);
     } else {
