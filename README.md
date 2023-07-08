@@ -49,6 +49,6 @@ You can change various parameters in `include/constants.h`.
 I consider the program (almost) feature complete. Further improvments planned are:
 
 - ~~new feature: reset key~~
-- refactor rendering, gamestate
+- ~~refactor rendering, gamestate~~
 - new control scheme
 - (using dynamic data structures)

@@ -7,6 +7,7 @@
 
 #include "constants.h"
 #include "gamestate.h"
+#include "renderstate.h"
 #include "mathstuff.h"
 
 #define GET_NODE_X(n) (n / MAX_NODES)
@@ -206,41 +207,8 @@ void handleEvents(Gamestate* gs) {
   }
 }
 
-void render(SDL_Renderer* r, Gamestate* gs) {
-  const SDL_Rect windowDimensions = {
-    .w = WINDOW_WIDTH,
-    .h = WINDOW_HEIGHT,
-    .x = 0,
-    .y = 0,
-  };
-
-  SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
-  SDL_RenderClear(r);
-
-  SDL_Surface* sdlSurf = SDL_CreateRGBSurface(
-      0,
-      windowDimensions.w,
-      windowDimensions.h,
-      32,
-      0x00ff0000,
-      0x0000ff00,
-      0x000000ff,
-      0x0
-  );
-  if (sdlSurf == NULL) {
-    perror("Could not create RGB Surface");
-    return;
-  }
-
-  cairo_surface_t* cairoSurf = cairo_image_surface_create_for_data(
-      sdlSurf->pixels,
-      CAIRO_FORMAT_RGB24,
-      windowDimensions.w,
-      windowDimensions.h,
-      sdlSurf->pitch
-  );
-
-  cairo_t* cr = cairo_create(cairoSurf);
+void render(Renderstate* rs, Gamestate* gs) {
+  cairo_t* cr = rs->cr;
 
   cairo_set_source_rgb(
       cr,
@@ -308,14 +276,7 @@ void render(SDL_Renderer* r, Gamestate* gs) {
     cairo_fill(cr);
   }
 
-  cairo_surface_destroy(cairoSurf);
-
-  SDL_Texture* sdlTexture = SDL_CreateTextureFromSurface(r, sdlSurf);
-  SDL_FreeSurface(sdlSurf);
-  SDL_RenderCopy(r, sdlTexture, &windowDimensions, &windowDimensions);
-  SDL_DestroyTexture(sdlTexture);
-
-  SDL_RenderPresent(r);
+  renderstate_render(rs);
 }
 
 int main(void) {
@@ -352,9 +313,12 @@ int main(void) {
   Gamestate gs;
   gamestate_init(&gs);
 
+  Renderstate rs;
+  renderstate_init(&rs, r);
+
   while (!gs.flags.quit) {
     handleEvents(&gs);
-    render(r, &gs);
+    render(&rs, &gs);
   }
 
   SDL_DestroyRenderer(r);

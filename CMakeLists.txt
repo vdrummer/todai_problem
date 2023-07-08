@@ -8,5 +8,6 @@ add_executable(
   src/main.c
   src/gamestate.c
   src/mathstuff.c
+  src/renderstate.c
 )
 target_link_libraries(todai_graph PRIVATE SDL2 cairo m)
