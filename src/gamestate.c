@@ -9,15 +9,15 @@ void gamestate_init(Gamestate* gs) {
   if (gs == NULL) {
     return;
   }
-  gs->quit = false;
-  gs->shiftPressed = false;
-  gs->moveMode = false;
-  gs->numNodes = 1;
+  gs->flags.quit = false;
+  gs->flags.shiftPressed = false;
+  gs->flags.moveMode = false;
+  gs->graph.numNodes = 1;
   gs->snapshotList = (SnapshotList) {0};
-  memset(gs->edges, 0, MAX_NODES * MAX_NODES);
-  memset(gs->nodes, 0, MAX_NODES);
+  memset(gs->graph.edges, 0, MAX_NODES * MAX_NODES);
+  memset(gs->graph.nodes, 0, MAX_NODES);
 
-  gs->nodes[0] = (Node) {
+  gs->graph.nodes[0] = (Node) {
     .color = COLOR_WHITE,
     .x = WINDOW_WIDTH / 2,
     .y = WINDOW_HEIGHT / 2,
