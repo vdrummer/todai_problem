@@ -43,6 +43,10 @@ void renderstate_init(Renderstate* rs, SDL_Renderer* r) {
 }
 
 void renderstate_render(Renderstate* rs) {
+  if (rs == NULL) {
+    return;
+  }
+
   SDL_Texture* sdlTexture = SDL_CreateTextureFromSurface(rs->r, rs->sdlSurf);
   SDL_RenderCopy(rs->r, sdlTexture, &rs->windowDimensions, &rs->windowDimensions);
   SDL_DestroyTexture(sdlTexture);
